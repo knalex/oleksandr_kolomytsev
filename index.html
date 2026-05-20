@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Oleksandr Kolomytsev</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0b0c0e;
+      --surface: #111316;
+      --border: #1e2127;
+      --accent: #c9a84c;
+      --accent2: #4c8dc9;
+      --text: #e8e4dc;
+      --muted: #7a7870;
+      --tag-bg: #181b20;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-weight: 300;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* Noise texture overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.35;
+    }
+
+    /* ─── HEADER ─── */
+    header {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 6rem 2rem 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    header::after {
+      content: 'OK';
+      position: absolute;
+      right: -2rem;
+      bottom: -4rem;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(14rem, 28vw, 28rem);
+      font-weight: 700;
+      color: var(--border);
+      letter-spacing: -0.05em;
+      user-select: none;
+      line-height: 1;
+    }
+
+    .header-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      width: 100%;
+      position: relative;
+      z-index: 1;
+    }
+
+    .eyebrow {
+      font-size: 0.7rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.2s forwards;
+    }
+
+    h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(3.5rem, 9vw, 7.5rem);
+      font-weight: 300;
+      line-height: 0.95;
+      letter-spacing: -0.02em;
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.35s forwards;
+    }
+
+    h1 em {
+      font-style: normal;
+      color: var(--accent);
+    }
+
+    .tagline {
+      font-size: clamp(0.75rem, 1.5vw, 0.9rem);
+      color: var(--muted);
+      max-width: 480px;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.5s forwards;
+    }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.62rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      opacity: 0;
+      animation: fadeUp 1s 1.2s forwards;
+    }
+
+    .scroll-line {
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(to bottom, var(--accent), transparent);
+      animation: scrollLine 1.8s ease-in-out infinite;
+    }
+
+    @keyframes scrollLine {
+      0%, 100% { transform: scaleY(1); opacity: 1; }
+      50% { transform: scaleY(0.4); opacity: 0.3; }
+    }
+
+    /* ─── SECTIONS ─── */
+    section {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 6rem 2rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .section-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 3rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 400;
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+    }
+
+    /* ─── SKILLS GRID ─── */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      margin-top: 3rem;
+    }
+
+    .skill-card {
+      background: var(--surface);
+      padding: 2rem 1.8rem;
+      transition: background 0.25s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .skill-card:hover { background: #161920; }
+
+    .skill-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 2px; height: 0;
+      background: var(--accent);
+      transition: height 0.35s ease;
+    }
+
+    .skill-card:hover::before { height: 100%; }
+
+    .skill-icon {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .skill-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.75rem;
+      letter-spacing: 0.02em;
+    }
+
+    .skill-desc {
+      font-size: 0.72rem;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 1rem;
+    }
+
+    .tag {
+      background: var(--tag-bg);
+      border: 1px solid var(--border);
+      color: var(--accent2);
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      padding: 0.25rem 0.6rem;
+      text-transform: uppercase;
+    }
+
+    /* ─── INTERESTS ─── */
+    .interests-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+
+    .interest-item {
+      display: flex;
+      gap: 1.5rem;
+      align-items: flex-start;
+    }
+
+    .interest-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.5rem;
+      font-weight: 300;
+      color: var(--border);
+      line-height: 1;
+      flex-shrink: 0;
+      transition: color 0.3s;
+    }
+
+    .interest-item:hover .interest-num { color: var(--accent); }
+
+    .interest-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+    }
+
+    .interest-desc {
+      font-size: 0.72rem;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    /* ─── CHESS ─── */
+    .chess-block {
+      margin-top: 4rem;
+      border: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      overflow: hidden;
+    }
+
+    @media (max-width: 600px) {
+      .chess-block { grid-template-columns: 1fr; }
+    }
+
+    .chess-board-wrap {
+      background: var(--surface);
+      padding: 2.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      border-right: 1px solid var(--border);
+    }
+
+    @media (max-width: 600px) {
+      .chess-board-wrap { border-right: none; border-bottom: 1px solid var(--border); }
+    }
+
+    .chess-board {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      width: 200px;
+      height: 200px;
+      border: 2px solid var(--accent);
+    }
+
+    .sq {
+      aspect-ratio: 1;
+    }
+
+    .sq.light { background: #d4b483; }
+    .sq.dark  { background: #8b6343; }
+
+    .chess-info {
+      padding: 2.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .chess-info h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem;
+      font-weight: 400;
+      margin-bottom: 0.75rem;
+    }
+
+    .chess-info p {
+      font-size: 0.72rem;
+      color: var(--muted);
+      line-height: 1.9;
+    }
+
+    .chess-quote {
+      margin-top: 1.25rem;
+      padding-left: 1rem;
+      border-left: 2px solid var(--accent);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      font-style: italic;
+      color: var(--text);
+      opacity: 0.7;
+    }
+
+    /* ─── VALUES ─── */
+    .values-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin-top: 3rem;
+    }
+
+    .value-line {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      padding: 1.5rem 0;
+      border-bottom: 1px solid var(--border);
+      transition: padding-left 0.3s;
+    }
+
+    .value-line:hover { padding-left: 1rem; }
+
+    .value-line:hover .value-dot { background: var(--accent); }
+
+    .value-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--muted);
+      flex-shrink: 0;
+      transition: background 0.3s;
+    }
+
+    .value-label {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.25rem;
+      min-width: 200px;
+    }
+
+    .value-desc {
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+
+    /* ─── CONTACT ─── */
+    .contact-block {
+      margin-top: 3rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+
+    .contact-item {
+      background: var(--surface);
+      padding: 2rem 1.8rem;
+      text-decoration: none;
+      color: inherit;
+      transition: background 0.25s;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .contact-item:hover { background: #161920; }
+
+    .contact-type {
+      font-size: 0.62rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .contact-val {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem;
+      color: var(--accent);
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      text-align: center;
+      padding: 3rem 2rem;
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      color: var(--border);
+      border-top: 1px solid var(--border);
+    }
+
+    /* ─── ANIMATIONS ─── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: none;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── HEADER ─── -->
+<header>
+  <div class="header-inner">
+    <p class="eyebrow">Engineering Manager · PHP Lead · Remote</p>
+    <h1>Oleksandr<br><em>Kolomytsev</em></h1>
+    <p class="tagline">Building systems that scale. Leading teams that ship. Thinking a few moves ahead.</p>
+  </div>
+  <div class="scroll-hint">
+    <div class="scroll-line"></div>
+    scroll
+  </div>
+</header>
+
+<!-- ─── SKILLS ─── -->
+<section>
+  <div class="section-label">What I bring</div>
+  <h2>Skills &amp; Expertise</h2>
+
+  <div class="skills-grid reveal">
+
+    <div class="skill-card">
+      <div class="skill-icon">⚙️</div>
+      <div class="skill-title">Engineering Leadership</div>
+      <div class="skill-desc">Scaling cross-functional teams, building a culture of ownership, transparency, and continuous improvement. Strong 1-on-1 and feedback practices.</div>
+      <div class="tags">
+        <span class="tag">Team Building</span>
+        <span class="tag">Hiring</span>
+        <span class="tag">Mentoring</span>
+      </div>
+    </div>
+
+    <div class="skill-card">
+      <div class="skill-icon">📐</div>
+      <div class="skill-title">Process Design</div>
+      <div class="skill-desc">Spec-Driven Development, predictable delivery without classic sprint overhead, prioritization frameworks, and readiness criteria that actually work.</div>
+      <div class="tags">
+        <span class="tag">SDD</span>
+        <span class="tag">Planning</span>
+        <span class="tag">Estimation</span>
+      </div>
+    </div>
+
+    <div class="skill-card">
+      <div class="skill-icon">🛡️</div>
+      <div class="skill-title">Quality Engineering</div>
+      <div class="skill-desc">Building QA from zero — E2E testing, unit coverage, static analysis (PHPStan / Psalm), documentation standards across multiple teams.</div>
+      <div class="tags">
+        <span class="tag">E2E</span>
+        <span class="tag">PHPStan</span>
+        <span class="tag">QA Design</span>
+      </div>
+    </div>
+
+    <div class="skill-card">
+      <div class="skill-icon">💻</div>
+      <div class="skill-title">Backend Engineering</div>
+      <div class="skill-desc">10+ years hands-on with PHP ecosystems: Laravel, Symfony, CodeIgniter. Databases: MySQL, PostgreSQL, MongoDB, Elasticsearch.</div>
+      <div class="tags">
+        <span class="tag">PHP</span>
+        <span class="tag">Laravel</span>
+        <span class="tag">Symfony</span>
+      </div>
+    </div>
+
+    <div class="skill-card">
+      <div class="skill-icon">🔒</div>
+      <div class="skill-title">Security & Compliance</div>
+      <div class="skill-desc">Event logging, audit trail design, access control reviews, and technical documentation for compliance readiness. Security-first mindset.</div>
+      <div class="tags">
+        <span class="tag">Audit Trails</span>
+        <span class="tag">Access Control</span>
+      </div>
+    </div>
+
+    <div class="skill-card">
+      <div class="skill-icon">📊</div>
+      <div class="skill-title">Data-Driven Decisions</div>
+      <div class="skill-desc">Supporting stakeholder decisions with metrics and insights. Balancing delivery speed with product quality through transparent, measured approaches.</div>
+      <div class="tags">
+        <span class="tag">Analytics</span>
+        <span class="tag">Reporting</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ─── INTERESTS ─── -->
+<section>
+  <div class="section-label">Beyond work</div>
+  <h2>Interests &amp; Pursuits</h2>
+
+  <div class="interests-list reveal">
+
+    <div class="interest-item">
+      <div class="interest-num">01</div>
+      <div>
+        <div class="interest-name">Chess Club</div>
+        <div class="interest-desc">Active member of a local chess club. Chess teaches what engineering confirms: strategy is about anticipating consequences several moves ahead, not just the next step.</div>
+      </div>
+    </div>
+
+    <div class="interest-item">
+      <div class="interest-num">02</div>
+      <div>
+        <div class="interest-name">Systems Thinking</div>
+        <div class="interest-desc">Fascinated by how complex systems behave — from software architecture to organisational dynamics. Reading about feedback loops, emergence, and second-order effects.</div>
+      </div>
+    </div>
+
+    <div class="interest-item">
+      <div class="interest-num">03</div>
+      <div>
+        <div class="interest-name">Continuous Learning</div>
+        <div class="interest-desc">Engineering podcasts, management books, technical deep-dives. Always looking for frameworks that challenge current assumptions and improve the way I think.</div>
+      </div>
+    </div>
+
+    <div class="interest-item">
+      <div class="interest-num">04</div>
+      <div>
+        <div class="interest-name">Remote Culture</div>
+        <div class="interest-desc">Advocate for thoughtful async-first communication. Interested in how distributed teams can be more cohesive and productive than co-located ones.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Chess block -->
+  <div class="chess-block reveal">
+    <div class="chess-board-wrap">
+      <div class="chess-board" id="chessboard"></div>
+    </div>
+    <div class="chess-info">
+      <h3>Chess Club Member</h3>
+      <p>Chess isn't just a game — it's a structured way to practise strategic thinking, patience, and the ability to see several layers into the future. Skills that transfer directly to engineering leadership.</p>
+      <div class="chess-quote">"Every chess master was once a beginner."<br>— Irving Chernev</div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── VALUES ─── -->
+<section>
+  <div class="section-label">How I work</div>
+  <h2>Working Style</h2>
+
+  <div class="values-row reveal">
+    <div class="value-line">
+      <div class="value-dot"></div>
+      <div class="value-label">Structured Clarity</div>
+      <div class="value-desc">I thrive when engineering, product, and business share clearly defined goals and specifications before implementation begins.</div>
+    </div>
+    <div class="value-line">
+      <div class="value-dot"></div>
+      <div class="value-label">Transparent Communication</div>
+      <div class="value-desc">Direct, honest feedback in every direction — up, down, and across. No surprises, no hidden agendas.</div>
+    </div>
+    <div class="value-line">
+      <div class="value-dot"></div>
+      <div class="value-label">Ownership Culture</div>
+      <div class="value-desc">I build environments where people take pride in their work and feel safe to experiment and improve.</div>
+    </div>
+    <div class="value-line">
+      <div class="value-dot"></div>
+      <div class="value-label">Continuous Improvement</div>
+      <div class="value-desc">Retrospectives, metrics, and honest reviews — not as ritual, but as genuine tools for growth.</div>
+    </div>
+    <div class="value-line">
+      <div class="value-dot"></div>
+      <div class="value-label">Remote-First Mindset</div>
+      <div class="value-desc">Async documentation, intentional meetings, clear written communication — the foundation of effective distributed work.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── CONTACT ─── -->
+<section>
+  <div class="section-label">Get in touch</div>
+  <h2>Contact</h2>
+
+  <div class="contact-block reveal">
+    <a class="contact-item" href="mailto:ankolomytsev@gmail.com">
+      <span class="contact-type">Email</span>
+      <span class="contact-val">ankolomytsev@gmail.com</span>
+    </a>
+    <a class="contact-item" href="https://t.me/kolomytsev_o" target="_blank" rel="noopener">
+      <span class="contact-type">Telegram</span>
+      <span class="contact-val">@kolomytsev_o</span>
+    </a>
+    <div class="contact-item">
+      <span class="contact-type">Mode</span>
+      <span class="contact-val">Remote · Open to opportunities</span>
+    </div>
+  </div>
+</section>
+
+<footer>© 2025 Oleksandr Kolomytsev &nbsp;·&nbsp; Crafted with intention</footer>
+
+<script>
+  // Chess board
+  const board = document.getElementById('chessboard');
+  for (let r = 0; r < 8; r++) {
+    for (let c = 0; c < 8; c++) {
+      const sq = document.createElement('div');
+      sq.className = 'sq ' + ((r + c) % 2 === 0 ? 'light' : 'dark');
+      board.appendChild(sq);
+    }
+  }
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => io.observe(el));
+</script>
+</body>
+</html>
